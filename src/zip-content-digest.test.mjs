@@ -63,13 +63,18 @@ describe('canonical ZIP content digest', () => {
     expect(later.entries).toEqual(['assets/options.css', 'manifest.json']);
   });
 
-  it('changes when a file payload or path changes', () => {
+  it('changes when a file payload, path, or entry count changes', () => {
     const original = canonicalZipContentDigest(storedZip([['manifest.json', '{"name":"Gate"}']], 0x1000));
     const changedContents = canonicalZipContentDigest(storedZip([['manifest.json', '{"name":"Other"}']], 0x1000));
     const changedPath = canonicalZipContentDigest(storedZip([['other.json', '{"name":"Gate"}']], 0x1000));
+    const extraEntry = canonicalZipContentDigest(storedZip([
+      ['manifest.json', '{"name":"Gate"}'],
+      ['unexpected.js', 'console.log("unexpected")']
+    ], 0x1000));
 
     expect(changedContents.digest).not.toBe(original.digest);
     expect(changedPath.digest).not.toBe(original.digest);
+    expect(extraEntry.digest).not.toBe(original.digest);
   });
 
   it('rejects an archive whose payload does not pass ZIP integrity checks', () => {
