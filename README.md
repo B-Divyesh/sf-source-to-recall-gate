@@ -40,7 +40,9 @@ npm test                 # unit tests
 npm run typecheck        # strict TypeScript
 npx playwright install chromium  # once, for browser tests
 npm run test:e2e         # desktop + 390 px flows and axe checks
-npm run build            # exact production build command
+npm run build:site       # exact static deploy build, including the MV3 ZIP
+npm run test:site-package # built ZIP + static route regression
+npm run build            # alias for the exact production build command
 ```
 
 `npm run build` produces:
@@ -49,6 +51,9 @@ npm run build            # exact production build command
 - `dist/site/privacy/index.html` and `dist/site/terms/index.html`;
 - `dist/site/downloads/source-to-recall-gate-chrome.zip`, the packaged MV3
   extension.
+
+After publishing, `npm run test:live-download` verifies that the production
+download has ZIP headers and byte-matches the archive in `dist/site`.
 
 To inspect the built extension without publishing it, open
 `chrome://extensions`, enable Developer mode, choose “Load unpacked,” and select
