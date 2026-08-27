@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f4eedc">
+    <meta name="description" content="Turn selected passages into recall prompts by making three deliberate decisions before export.">
+    <title>Source-to-Recall Gate — remember less, better</title>
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="icon" href="/icon/32.png" sizes="32x32">
+    <link rel="preload" as="image" href="/assets/press-gate-720.webp" type="image/webp" media="(max-width: 720px)">
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <header class="site-header">
+      <a class="brand" href="/" aria-label="Source-to-Recall Gate home">
+        <img src="/icon/48.png" width="40" height="40" alt="">
+        <span>Source → Recall</span>
+      </a>
+      <nav aria-label="Primary">
+        <a href="#gate">Use the gate</a>
+        <a href="#press-pass">Press Pass</a>
+        <a class="nav-download" href="/downloads/source-to-recall-gate-chrome.zip" download>Get extension</a>
+      </nav>
+    </header>
+
+    <main id="main">
+      <section class="hero">
+        <div class="hero-copy">
+          <div class="eyebrow"><span>Local study utility</span><span>Edition 01</span></div>
+          <h1>Don’t save the highlight.<br><em>Earn the recall cue.</em></h1>
+          <p class="hero-lede">A tiny decision gate between “interesting” and “worth remembering.” Paraphrase it, cue it, prove where you’ll use it—then export.</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#gate">Try the local gate <span aria-hidden="true">↓</span></a>
+            <a class="button button-outline" href="/downloads/source-to-recall-gate-chrome.zip" download>Download Chrome extension</a>
+          </div>
+          <ul class="trust-line" aria-label="Product principles">
+            <li>Local only</li><li>No AI cards</li><li>No account</li>
+          </ul>
+        </div>
+        <figure class="hero-art">
+          <picture>
+            <source media="(max-width: 720px)" srcset="/assets/press-gate-720.webp" type="image/webp">
+            <source srcset="/assets/press-gate-1200.webp" type="image/webp">
+            <img src="/assets/press-gate-1200.jpg" width="1200" height="800" fetchpriority="high" decoding="async" alt="A dithered two-color printing press reduces one broad paper strip through three gates into a single small blank card.">
+          </picture>
+          <figcaption><span>Fig. A</span> Three decisions reduce a passage into one usable cue.</figcaption>
+        </figure>
+      </section>
+
+      <section class="manifesto" aria-labelledby="manifesto-title">
+        <span class="manifesto-index" aria-hidden="true">01</span>
+        <div>
+          <p class="section-kicker">The queue-debt rule</p>
+          <h2 id="manifesto-title">If you can’t make it yours, don’t make it a card.</h2>
+        </div>
+        <p>Spaced repetition retrieves what you already encoded. This gate does the earlier work: it makes you decide what the idea means, what should summon it, and where it becomes useful.</p>
+      </section>
+
+      <section class="gate-shell" id="gate" aria-labelledby="gate-title">
+        <div class="gate-intro">
+          <p class="section-kicker">Working proof</p>
+          <h2 id="gate-title">Put one passage through the gate.</h2>
+          <p>Works offline after first load. Your text stays in this browser until you export or delete it.</p>
+        </div>
+        <div class="gate-app" data-mode="site">
+          <div class="loading-state" role="status"><span aria-hidden="true">•••</span> Opening the local press…</div>
+        </div>
+      </section>
+
+      <section class="how-it-works" aria-labelledby="how-title">
+        <div class="section-kicker">Browser extension</div>
+        <h2 id="how-title">Capture without collecting.</h2>
+        <ol>
+          <li><strong>Select.</strong><span>Highlight only the exact passage on the page.</span></li>
+          <li><strong>Send.</strong><span>Right-click “Send selection to Recall Gate” or press Alt + Shift + G.</span></li>
+          <li><strong>Decide.</strong><span>The local workbench opens. Finish the gate or discard the passage.</span></li>
+        </ol>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div><strong>Source-to-Recall Gate</strong><p>A local-first utility from the Param Factory.</p></div>
+      <nav aria-label="Legal"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="https://source-to-recall-gate.sociobot.in">Live site</a></nav>
+      <p class="art-note">Hero illustration generated for this product with Azure AI Foundry; no stock assets or user data used.</p>
+    </footer>
+    <script type="module" src="/site.ts"></script>
+  </body>
+</html>

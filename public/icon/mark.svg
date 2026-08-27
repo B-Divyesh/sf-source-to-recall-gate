@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title">
+  <title id="title">Source-to-Recall Gate mark</title>
+  <rect width="128" height="128" rx="18" fill="#f4eedc"/>
+  <path d="M25 29h78v18H25z" fill="#171713"/>
+  <path d="M25 55h50v18H25z" fill="#b52a1d"/>
+  <path d="M25 81h31v18H25z" fill="#125b68"/>
+  <path d="M91 53v51M83 96l8 8 8-8" fill="none" stroke="#171713" stroke-width="8"/>
+</svg>

@@ -1,6 +1,6 @@
 node_modules/
 dist/
-.env
+.output/
+.wxt/
+coverage/
 *.log
-graphify-out/
-.DS_Store
