@@ -243,6 +243,13 @@ export async function mountWorkbench(root: HTMLElement): Promise<void> {
     return captures.find((item) => item.id === selectedId);
   }
 
+  function applyDecisionEdits(capture: Capture): void {
+    const data = new FormData(proofForm);
+    capture.paraphrase = String(data.get('paraphrase') ?? '').trim();
+    capture.cue = String(data.get('cue') ?? '').trim();
+    capture.useCase = String(data.get('useCase') ?? '').trim();
+  }
+
   function openCapture(capture: Capture, focus = false): void {
     selectedId = capture.id;
     proofBlank.hidden = true;
@@ -365,10 +372,7 @@ export async function mountWorkbench(root: HTMLElement): Promise<void> {
     proofError.textContent = '';
     const capture = currentCapture();
     if (!capture) return;
-    const data = new FormData(proofForm);
-    capture.paraphrase = String(data.get('paraphrase') ?? '').trim();
-    capture.cue = String(data.get('cue') ?? '').trim();
-    capture.useCase = String(data.get('useCase') ?? '').trim();
+    applyDecisionEdits(capture);
     try {
       await upsertCapture(capture);
       await reload();
@@ -382,10 +386,16 @@ export async function mountWorkbench(root: HTMLElement): Promise<void> {
     const capture = currentCapture();
     if (!capture) return;
     const format = button.dataset.export as ExportFormat;
+    proofError.textContent = '';
     try {
+      // Export is available as soon as the three visible decisions are complete.
+      // Persist those current edits before serialization so its state matches the UI.
+      applyDecisionEdits(capture);
+      await upsertCapture(capture);
       download(`recall-${capture.id.slice(0, 8)}.${extensionFor(format)}`, serializeCaptures([capture], format), mimeFor(format));
       capture.exportedAt = new Date().toISOString();
       await upsertCapture(capture);
+      renderQueue();
       notify(`Exported ${format === 'anki' ? 'Anki TSV' : format}.`);
     } catch (error) {
       proofError.textContent = error instanceof Error ? error.message : 'Export failed.';

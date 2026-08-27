@@ -49,6 +49,24 @@ test('captures, gates, persists, and exports a selected passage', async ({ page 
   await expect((await download).suggestedFilename()).toMatch(/\.md$/);
 });
 
+test('exports the completed visible decisions before Save decisions is clicked', async ({ page }) => {
+  await page.locator('#capture-passage').fill('Encoding before retrieval makes a study prompt more useful.');
+  await page.getByRole('button', { name: /Add to gate/ }).click();
+  await page.locator('#paraphrase').fill('Understand the idea before testing recall.');
+  await page.locator('#cue').fill('What should happen before retrieval?');
+  await page.locator('#use-case').fill('When I make prompts from reading notes.');
+
+  await expect(page.getByRole('button', { name: 'CSV' })).toBeEnabled();
+  const download = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'CSV' }).click();
+  await expect((await download).suggestedFilename()).toMatch(/\.csv$/);
+
+  await page.reload();
+  await page.getByRole('button', { name: /Ready What should happen before retrieval/ }).click();
+  await expect(page.locator('#paraphrase')).toHaveValue('Understand the idea before testing recall.');
+  await expect(page.locator('#use-case')).toHaveValue('When I make prompts from reading notes.');
+});
+
 test('fits a 390px viewport without page-level horizontal overflow', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'mobile-390');
   const dimensions = await page.evaluate(() => ({ width: document.documentElement.clientWidth, scroll: document.documentElement.scrollWidth }));
