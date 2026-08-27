@@ -54,16 +54,25 @@ CSS 19.31 KB (4.84 KB gzip), no webfonts, and the mobile hero is 106.85 KB.
 
 ## Deploy and live checks
 
-Deploy the already-built static root with:
+Published the final `dist/site` through the factory's Standard static deployer
+on 2026-08-27 (Azure Static Web Apps deployment
+`9bae732d-c71a-4b73-891c-18fc708b7d8d`). The live URL is
+<https://source-to-recall-gate.sociobot.in>.
 
-```bash
-/opt/fleet/lib/deploy-static.sh source-to-recall-gate dist/site
-```
+Live verification passed:
 
-Then verify the live root with `/opt/fleet/lib/verify-url.sh`, run the browser
-axe suite/Lighthouse, and verify the download with `curl -D -` plus `unzip -t`.
-The post-deploy outcome and live measurements are recorded below after
-deployment.
+- `/opt/fleet/lib/verify-url.sh` returned HTTP 200 with no browser console or
+  page errors; it found the title, `lang=en`, exactly one `h1`, a `main`, and
+  no images missing `alt`.
+- Playwright's axe integration at 390 px found zero serious or critical
+  violations and no console errors. (The standalone axe CLI could not launch
+  Chrome as root in this container, so the repository's Playwright axe runner
+  was used.)
+- The download endpoint returned HTTP 200, `content-type: application/zip`,
+  `content-disposition: attachment`, immutable cache control, ZIP magic, and
+  passed `unzip -t`. A missing ZIP returns HTTP 404 instead of `index.html`.
+- Mobile Lighthouse: Performance **100**, Accessibility **100**; FCP **1.1 s**,
+  LCP **1.3 s**, TBT **70 ms**, CLS **0**.
 
 ## Known gaps
 
