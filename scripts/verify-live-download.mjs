@@ -1,6 +1,6 @@
-import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
+import { canonicalZipContentDigest } from './zip-content-digest.mjs';
 
 const baseUrl = (process.env.SITE_URL ?? 'https://source-to-recall-gate.sociobot.in').replace(/\/$/, '');
 const endpoint = `${baseUrl}/downloads/source-to-recall-gate-chrome.zip`;
@@ -23,9 +23,16 @@ if (liveBytes.subarray(0, 4).toString('ascii') !== 'PK\x03\x04') {
 }
 
 const localArchive = await readFile(resolve('dist/site/downloads/source-to-recall-gate-chrome.zip'));
-const digest = (bytes) => createHash('sha256').update(bytes).digest('hex');
-if (digest(liveBytes) !== digest(localArchive)) {
-  throw new Error('Live download bytes do not match the archive in dist/site.');
+const liveArchive = canonicalZipContentDigest(liveBytes);
+const localArchiveDigest = canonicalZipContentDigest(localArchive);
+if (liveArchive.digest !== localArchiveDigest.digest) {
+  throw new Error(
+    `Live download content does not match the archive in dist/site. `
+    + `Live digest: ${liveArchive.digest}; local digest: ${localArchiveDigest.digest}.`
+  );
 }
 
-console.log(`Live-download regression passed: ${endpoint} serves the exact ${liveBytes.length}-byte ZIP.`);
+console.log(
+  `Live-download regression passed: ${endpoint} serves a ${liveBytes.length}-byte ZIP `
+  + `with matching canonical content digest ${liveArchive.digest}.`
+);

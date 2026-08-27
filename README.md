@@ -53,7 +53,10 @@ npm run build            # alias for the exact production build command
   extension.
 
 After publishing, `npm run test:live-download` verifies that the production
-download has ZIP headers and byte-matches the archive in `dist/site`.
+download has ZIP headers and a canonical path-and-content digest matching the
+archive in `dist/site`. This intentionally ignores ZIP wrapper timestamps,
+which WXT regenerates on every build, while detecting any changed, missing, or
+extra packaged file.
 
 To inspect the built extension without publishing it, open
 `chrome://extensions`, enable Developer mode, choose “Load unpacked,” and select
