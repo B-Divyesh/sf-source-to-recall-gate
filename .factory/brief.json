@@ -1,0 +1,30 @@
+{
+  "slug": "source-to-recall-gate",
+  "title": "Source-to-Recall Gate",
+  "territory": "utilities",
+  "user": "Students converting highlights into study prompts who need to decide what is worth remembering and encode it as a personally meaningful recall cue before it becomes queue debt.",
+  "evidence": [
+    {
+      "url": "https://hn.algolia.com/api/v1/items/44118333",
+      "date": "2025-05-28",
+      "quote_or_summary": "The discussion distinguishes spaced repetition as retrieval from the separate encoding work required to make knowledge one's own."
+    },
+    {
+      "url": "https://forums.ankiweb.net/t/impact-of-a-separate-incremental-reading-deck-on-fsrs-scheduling/55184",
+      "date": "2025-02-01",
+      "quote_or_summary": "A reader who forgets books wants to import highlights but explicitly does not want to memorize paragraphs, exposing the highlight-to-recall design problem."
+    }
+  ],
+  "recurrence": "Both threads describe adding material before deciding what the learner can retrieve from it; this routinely produces bloated decks and abandoned review habits.",
+  "current_workaround": "Dump highlights into Readwise/Notion, import cloze deletions wholesale, or reread passages on a schedule.",
+  "incumbents_and_gap": "Readwise captures highlights and Anki reviews finished cards; neither imposes a tiny decision gate: why this matters, what cue will retrieve it, and what concrete example proves it.",
+  "smallest_useful_product": "Browser extension and PWA that saves a selected passage locally, requires one paraphrase, one cue, and one use-case before export as Markdown/CSV/Anki TSV. Non-goals: web scraping, AI-generated cards, cloud highlight sync, or a reader app.",
+  "success_measure": "In a 30-day cohort, users export fewer than 50% of captured highlights but review 70%+ of those exports at least twice.",
+  "artifact_class": "browser-extension",
+  "monetization": "one-time — a local export utility has a clear individual value and no server cost.",
+  "constraints": "Only user-selected text; no copying of protected books into a service; local storage, clipboard permissions, and clear data deletion.",
+  "est_build_effort": "M",
+  "why_distinct": "It deliberately reduces card creation and makes encoding quality visible instead of automating more flashcards.",
+  "confidence": 5,
+  "state": "RESEARCHED"
+}
