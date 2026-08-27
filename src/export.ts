@@ -11,11 +11,21 @@ function assertReady(captures: Capture[]): void {
 }
 
 function csvCell(value: string): string {
-  return `"${value.replaceAll('"', '""')}"`;
+  const spreadsheetSafe = /^[\t\r\n ]*[=+\-@]/.test(value) ? `'${value}` : value;
+  return `"${spreadsheetSafe.replaceAll('"', '""')}"`;
 }
 
 function tsvCell(value: string): string {
   return value.replaceAll('\t', ' ').replaceAll(/\r?\n/g, '<br>');
+}
+
+function html(value: string): string {
+  return tsvCell(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
 }
 
 function safeMarkdown(value: string): string {
@@ -44,7 +54,7 @@ export function serializeCaptures(captures: Capture[], format: ExportFormat): st
   }
   return captures.map((item) => [
     tsvCell(item.cue),
-    tsvCell(`<strong>In my words:</strong> ${item.paraphrase}<br><br><strong>Use it when:</strong> ${item.useCase}<br><br><blockquote>${item.passage}</blockquote>${item.sourceTitle ? `<br><small>${item.sourceTitle}</small>` : ''}`),
+    `<strong>In my words:</strong> ${html(item.paraphrase)}<br><br><strong>Use it when:</strong> ${html(item.useCase)}<br><br><blockquote>${html(item.passage)}</blockquote>${item.sourceTitle ? `<br><small>${html(item.sourceTitle)}</small>` : ''}`,
     'source-to-recall-gate'
   ].join('\t')).join('\n') + '\n';
 }

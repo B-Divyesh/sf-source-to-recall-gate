@@ -159,7 +159,7 @@ export async function mountWorkbench(root: HTMLElement): Promise<void> {
             <label for="license-token">License token</label>
             <div class="inline-form">
               <input id="license-token" name="license" type="password" autocomplete="off" required>
-              <button class="button button-paper-outline" type="submit">Verify license</button>
+              <button class="button button-paper-outline" type="submit" aria-label="Verify license token">Verify license</button>
             </div>
             <p class="license-error" data-license-error role="alert"></p>
           </form>

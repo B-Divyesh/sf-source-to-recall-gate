@@ -4,3 +4,7 @@ dist/
 .wxt/
 coverage/
 *.log
+graphify-out/
+.factory/evidence/
+playwright-report/
+test-results/

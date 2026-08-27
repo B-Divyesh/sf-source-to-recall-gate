@@ -47,12 +47,23 @@ describe('export formats', () => {
     expect(output).toContain('"Why “retrieve”, now?"');
   });
 
+  it('neutralizes spreadsheet formulas in CSV exports', () => {
+    const output = serializeCaptures([readyCapture({ cue: '=IMPORTXML("bad")' })], 'csv');
+    expect(output).toContain("'=IMPORTXML");
+  });
+
   it('produces three-column Anki TSV without raw newlines in fields', () => {
     const output = serializeCaptures([readyCapture({ useCase: 'During\na review' })], 'anki');
     const row = output.trim().split('\t');
     expect(row).toHaveLength(3);
     expect(row[1]).toContain('<br>');
     expect(row[2]).toBe('source-to-recall-gate');
+  });
+
+  it('escapes user HTML in Anki fields', () => {
+    const output = serializeCaptures([readyCapture({ passage: '<img src=x onerror=alert(1)>' })], 'anki');
+    expect(output).toContain('&lt;img');
+    expect(output).not.toContain('<img');
   });
 
   it('creates readable Markdown for multiple cards', () => {

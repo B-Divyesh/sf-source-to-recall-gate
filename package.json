@@ -10,12 +10,16 @@
     "build:site": "vite build",
     "build:extension": "wxt build",
     "zip": "wxt zip",
-    "test": "vitest run --root .",
-    "test:watch": "vitest --root .",
+    "test": "vitest run --root . src",
+    "test:watch": "vitest --root . src",
+    "test:e2e": "playwright test",
+    "test:extension": "npm run build:extension && node scripts/smoke-extension.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {},
   "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
+    "@playwright/test": "^1.51.0",
     "@types/node": "^22.10.7",
     "@types/chrome": "^0.0.302",
     "typescript": "^5.7.3",

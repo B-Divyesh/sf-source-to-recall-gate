@@ -8,6 +8,7 @@ export default defineConfig({
     description: 'Turn selected passages into personally meaningful recall cues before they become queue debt.',
     version: '1.0.0',
     permissions: ['storage', 'contextMenus', 'activeTab', 'scripting'],
+    host_permissions: ['https://api.sociobot.in/*'],
     action: { default_title: 'Send selection to the gate' },
     commands: {
       'capture-selection': {
