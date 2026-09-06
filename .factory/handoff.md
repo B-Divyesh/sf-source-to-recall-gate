@@ -67,7 +67,8 @@ original generated-art provenance remain in `.factory/design.md`.
 
 ## Verification
 
-From a clean clone at the implementation SHA with Node 22.23.2 and npm 10.9.8:
+From a clean clone at `ae298f6545735a008ed0d6b6cce6deb0f3fbd073` with
+Node 22.23.2 and npm 10.9.8:
 
 ```text
 npm ci                          PASS (0 advisories)
@@ -80,6 +81,12 @@ npm run test:extension          PASS
 npm run test:e2e                PASS (35 passed, 1 intended project skip)
 npm audit                       PASS (0 advisories)
 ```
+
+The same clean clone was then fast-forwarded to final implementation
+`7b944230aa186b912498cd379348a6cdc05b8064`, whose only additional product
+change corrected the external factory link. `npm ci` and every one of the 15
+declared claim commands passed again. The changed link also passed the local
+route crawl and the full live link crawl below.
 
 Post-deploy checks against the final implementation:
 
