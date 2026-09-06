@@ -1,8 +1,8 @@
 {
   "name": "Source-to-Recall Gate",
   "short_name": "Recall Gate",
-  "description": "Turn selected passages into personally meaningful recall cues.",
-  "start_url": "/#gate",
+  "description": "Turn selected passages into recall prompts after writing three short answers.",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#f4eedc",
   "theme_color": "#f4eedc",

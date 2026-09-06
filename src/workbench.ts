@@ -1,9 +1,10 @@
 import { extensionFor, mimeFor, serializeCaptures, type ExportFormat } from './export';
-import { CHECKOUT_URL, initializeLicense, restoreLicense, type LicenseState } from './license';
-import { addCapture, clearCaptures, getCaptures, removeCapture, saveCaptures, upsertCapture } from './storage';
-import { createCapture, FIELD_LIMITS, isReady, type Capture } from './types';
+import { initializeLicense, restoreLicense, type LicenseState } from './license';
+import { addCapture, clearCaptures, ensureDemoCaptures, getCaptures, removeCapture, saveCaptures, upsertCapture, type StorageNamespace } from './storage';
+import { createCapture, FIELD_LIMITS, isReady, isStoredCapture, type Capture } from './types';
 
 type Filter = 'all' | 'draft' | 'ready';
+type WorkbenchOptions = { demo?: boolean; paidRoot?: HTMLElement };
 
 function select<T extends Element>(root: ParentNode, selector: string): T {
   const element = root.querySelector<T>(selector);
@@ -24,15 +25,17 @@ function formatDate(date: string): string {
   return new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' }).format(new Date(date));
 }
 
-export async function mountWorkbench(root: HTMLElement): Promise<void> {
+export async function mountWorkbench(root: HTMLElement, options: WorkbenchOptions = {}): Promise<void> {
+  const namespace: StorageNamespace = options.demo ? 'demo' : 'real';
+  if (options.demo) await ensureDemoCaptures();
   root.innerHTML = `
     <div class="network-note" data-network role="status"></div>
     <section class="capture-strip" aria-labelledby="capture-heading">
-      <div class="section-kicker">Intake / 01</div>
+      <div class="section-kicker">Add a passage / 01</div>
       <div class="capture-heading-row">
         <div>
           <h2 id="capture-heading">Capture only what you selected</h2>
-          <p>Nothing is uploaded. Add a passage, then decide whether it deserves recall.</p>
+          <p>Add a passage, then decide whether it is useful enough to export.</p>
         </div>
         <button class="button button-quiet clipboard-button" type="button">Paste from clipboard</button>
       </div>
@@ -54,16 +57,16 @@ export async function mountWorkbench(root: HTMLElement): Promise<void> {
         </div>
         <div class="form-action-row">
           <p class="form-error" data-capture-error role="alert"></p>
-          <button class="button button-primary" type="submit">Add to gate <span aria-hidden="true">→</span></button>
+          <button class="button button-primary" type="submit">Add passage <span aria-hidden="true">→</span></button>
         </div>
       </form>
     </section>
 
     <section class="workbench" aria-labelledby="workbench-heading">
       <aside class="queue-panel" aria-label="Passage queue">
-        <div class="section-kicker">Queue / 02</div>
+        <div class="section-kicker">Saved passages / 02</div>
         <div class="queue-title-row">
-          <h2 id="workbench-heading">Decision queue</h2>
+          <h2 id="workbench-heading">Passages to review</h2>
           <span class="count-stamp" data-total-count>0</span>
         </div>
         <div class="filter-bar" role="group" aria-label="Filter passages">
@@ -74,7 +77,7 @@ export async function mountWorkbench(root: HTMLElement): Promise<void> {
         <div class="queue-list" data-queue-list></div>
         <div class="queue-empty" data-queue-empty>
           <span class="empty-glyph" aria-hidden="true">∅</span>
-          <p><strong>The press is clear.</strong><br>Add one selected passage above or use the browser extension.</p>
+          <p><strong>No passages yet.</strong><br>Add selected text above or use the browser extension.</p>
         </div>
         <button class="text-button danger-action" type="button" data-clear-all hidden>Delete all local data</button>
       </aside>
@@ -82,13 +85,13 @@ export async function mountWorkbench(root: HTMLElement): Promise<void> {
       <section class="proof-panel" aria-live="polite">
         <div class="proof-blank" data-proof-blank>
           <div class="proof-number" aria-hidden="true">03</div>
-          <h2>Choose a passage to work</h2>
-          <p>The gate asks for three small decisions. If you cannot make them, discard the passage instead of creating queue debt.</p>
+          <h2>Choose a passage</h2>
+          <p>Write three short answers. Discard the passage if you cannot explain why it matters.</p>
         </div>
         <form class="proof-form" data-proof-form hidden novalidate>
           <div class="proof-topline">
             <div>
-              <div class="section-kicker">Proof / 03</div>
+              <div class="section-kicker">Review passage / 03</div>
               <p class="source-byline" data-source-byline></p>
             </div>
             <div class="readiness" data-readiness><span class="readiness-mark" aria-hidden="true">0/3</span><span>decisions made</span></div>
@@ -132,7 +135,7 @@ export async function mountWorkbench(root: HTMLElement): Promise<void> {
             <div>
               <span class="section-kicker">Output / 04</span>
               <h3>Export this recall prompt</h3>
-              <p data-export-help>Complete all three decisions to unlock export.</p>
+              <p data-export-help>Complete all three decisions to export this prompt.</p>
             </div>
             <div class="export-buttons" role="group" aria-label="Export this prompt">
               <button class="button button-outline" type="button" data-export="markdown" disabled>Markdown</button>
@@ -146,13 +149,14 @@ export async function mountWorkbench(root: HTMLElement): Promise<void> {
 
     <section class="press-pass" id="press-pass" aria-labelledby="pass-heading">
       <div class="pass-copy">
-        <span class="section-kicker inverse">Press pass / Optional</span>
-        <h2 id="pass-heading">Move a whole ready stack.</h2>
-        <p>The free gate always exports one prompt at a time. A <strong>$9 one-time</strong> Press Pass adds batch export and local backup/restore. No subscription.</p>
+        <span class="section-kicker inverse">Paid tools</span>
+        <h2 id="pass-heading">Export and back up several prompts</h2>
+        <p>Free tools export one prompt at a time. A <strong>$9 one-time</strong> Press Pass adds batch export and local backup and restore. No subscription.</p>
         <div class="pass-actions">
-          <a class="button button-paper" href="${CHECKOUT_URL}" target="_blank" rel="noreferrer">Buy Press Pass — $9</a>
+          <span class="button button-paper checkout-unavailable" aria-disabled="true">Checkout setup pending — $9</span>
           <span class="license-status" data-license-status role="status">Checking local license…</span>
         </div>
+        <p class="checkout-note">Sociobot is registering this offer. Existing license holders can still restore access below.</p>
         <details class="restore-license">
           <summary>Have a license? Restore it</summary>
           <form data-license-form>
@@ -173,7 +177,7 @@ export async function mountWorkbench(root: HTMLElement): Promise<void> {
           <option value="csv">CSV</option>
           <option value="anki">Anki TSV</option>
         </select>
-        <button class="button button-paper" type="button" data-batch-export disabled>Export ready stack</button>
+        <button class="button button-paper" type="button" data-batch-export disabled>Export ready prompts</button>
         <button class="button button-paper-outline" type="button" data-backup disabled>Download local backup</button>
         <label class="button button-paper-outline upload-label" aria-disabled="true" data-restore-label>Restore local backup<input type="file" accept="application/json,.json" data-restore-backup disabled></label>
       </div>
@@ -192,6 +196,12 @@ export async function mountWorkbench(root: HTMLElement): Promise<void> {
     </dialog>
     <div class="toast" data-toast role="status" aria-live="polite" hidden><span data-toast-copy></span><button type="button" data-undo hidden>Undo</button></div>
   `;
+
+  if (options.paidRoot) {
+    const paidSection = root.querySelector<HTMLElement>('.press-pass');
+    if (paidSection) options.paidRoot.replaceChildren(paidSection);
+    root = root.ownerDocument.documentElement;
+  }
 
   let captures: Capture[] = [];
   let selectedId = '';
@@ -236,7 +246,7 @@ export async function mountWorkbench(root: HTMLElement): Promise<void> {
     readiness.classList.toggle('is-ready', complete === 3);
     const ready = complete === 3;
     root.querySelectorAll<HTMLButtonElement>('[data-export]').forEach((button) => button.disabled = !ready);
-    select<HTMLElement>(root, '[data-export-help]').textContent = ready ? 'This prompt is ready. Choose the format that fits your review tool.' : 'Complete all three decisions to unlock export.';
+    select<HTMLElement>(root, '[data-export-help]').textContent = ready ? 'This prompt is ready. Choose the format that fits your review tool.' : 'Complete all three decisions to export this prompt.';
   }
 
   function currentCapture(): Capture | undefined {
@@ -291,7 +301,7 @@ export async function mountWorkbench(root: HTMLElement): Promise<void> {
       queueEmpty.hidden = false;
       queueEmpty.querySelector('p')!.innerHTML = '<strong>No passages in this view.</strong><br>Try another queue filter.';
     } else if (!captures.length) {
-      queueEmpty.querySelector('p')!.innerHTML = '<strong>The press is clear.</strong><br>Add one selected passage above or use the browser extension.';
+      queueEmpty.querySelector('p')!.innerHTML = '<strong>No passages yet.</strong><br>Add selected text above or use the browser extension.';
     }
     select<HTMLElement>(root, '[data-total-count]').textContent = String(captures.length);
     select<HTMLElement>(root, '[data-ready-count]').textContent = String(captures.filter(isReady).length);
@@ -299,7 +309,7 @@ export async function mountWorkbench(root: HTMLElement): Promise<void> {
   }
 
   async function reload(): Promise<void> {
-    captures = await getCaptures();
+    captures = await getCaptures(namespace);
     renderQueue();
     if (selectedId) {
       const updated = currentCapture();
@@ -330,12 +340,12 @@ export async function mountWorkbench(root: HTMLElement): Promise<void> {
     captureError.textContent = '';
     try {
       const capture = createCapture({ passage: capturePassage.value, sourceTitle: captureTitle.value, sourceUrl: captureUrl.value });
-      await addCapture(capture);
+      await addCapture(capture, namespace);
       captureForm.reset();
       select<HTMLElement>(root, '[data-capture-count]').textContent = '0';
       await reload();
       openCapture(capture, true);
-      notify('Passage added. Make three decisions or discard it.');
+      notify('Passage added. Write three answers or discard it.');
     } catch (error) {
       captureError.textContent = error instanceof Error ? error.message : 'Could not save this passage locally.';
       capturePassage.focus();
@@ -374,7 +384,7 @@ export async function mountWorkbench(root: HTMLElement): Promise<void> {
     if (!capture) return;
     applyDecisionEdits(capture);
     try {
-      await upsertCapture(capture);
+      await upsertCapture(capture, namespace);
       await reload();
       notify(isReady(capture) ? 'Saved. This recall prompt is ready to export.' : 'Draft saved locally.');
     } catch {
@@ -391,10 +401,10 @@ export async function mountWorkbench(root: HTMLElement): Promise<void> {
       // Export is available as soon as the three visible decisions are complete.
       // Persist those current edits before serialization so its state matches the UI.
       applyDecisionEdits(capture);
-      await upsertCapture(capture);
+      await upsertCapture(capture, namespace);
       download(`recall-${capture.id.slice(0, 8)}.${extensionFor(format)}`, serializeCaptures([capture], format), mimeFor(format));
       capture.exportedAt = new Date().toISOString();
-      await upsertCapture(capture);
+      await upsertCapture(capture, namespace);
       renderQueue();
       notify(`Exported ${format === 'anki' ? 'Anki TSV' : format}.`);
     } catch (error) {
@@ -404,7 +414,7 @@ export async function mountWorkbench(root: HTMLElement): Promise<void> {
 
   select<HTMLButtonElement>(root, '[data-discard]').addEventListener('click', async () => {
     if (!selectedId) return;
-    removedForUndo = await removeCapture(selectedId);
+    removedForUndo = await removeCapture(selectedId, namespace);
     selectedId = '';
     await reload();
     notify('Passage discarded from this device.', true);
@@ -412,7 +422,7 @@ export async function mountWorkbench(root: HTMLElement): Promise<void> {
 
   select<HTMLButtonElement>(root, '[data-undo]').addEventListener('click', async () => {
     if (!removedForUndo) return;
-    await addCapture(removedForUndo);
+    await addCapture(removedForUndo, namespace);
     const restored = removedForUndo;
     removedForUndo = undefined;
     await reload();
@@ -423,7 +433,7 @@ export async function mountWorkbench(root: HTMLElement): Promise<void> {
   select<HTMLButtonElement>(root, '[data-clear-all]').addEventListener('click', () => clearDialog.showModal());
   clearDialog.addEventListener('close', async () => {
     if (clearDialog.returnValue !== 'confirm') return;
-    await clearCaptures();
+    await clearCaptures(namespace);
     selectedId = '';
     await reload();
     notify('All local passages were deleted.');
@@ -435,7 +445,7 @@ export async function mountWorkbench(root: HTMLElement): Promise<void> {
     const error = select<HTMLElement>(root, '[data-license-error]');
     error.textContent = '';
     try {
-      license = await restoreLicense(String(new FormData(form).get('license') ?? ''));
+      license = await restoreLicense(String(new FormData(form).get('license') ?? ''), fetch, options.demo);
       updateLicenseUi();
       if (!license.unlocked) error.textContent = license.notice || 'That license could not be verified.';
     } catch {
@@ -451,7 +461,7 @@ export async function mountWorkbench(root: HTMLElement): Promise<void> {
       download(`recall-ready-stack.${extensionFor(format)}`, serializeCaptures(ready, format), mimeFor(format));
       const exportedAt = new Date().toISOString();
       ready.forEach((capture) => capture.exportedAt = exportedAt);
-      await saveCaptures(captures);
+      await saveCaptures(captures, namespace);
       notify(`Exported ${ready.length} ready prompt${ready.length === 1 ? '' : 's'}.`);
     } catch (error) {
       notify(error instanceof Error ? error.message : 'Batch export failed.');
@@ -469,13 +479,12 @@ export async function mountWorkbench(root: HTMLElement): Promise<void> {
     const file = input.files?.[0];
     if (!file) return;
     try {
-      const backup = JSON.parse(await file.text()) as { version: number; captures: Capture[] };
-      if (backup.version !== 1 || !Array.isArray(backup.captures)) throw new Error();
-      const valid = backup.captures.filter((item) => item && typeof item.id === 'string' && typeof item.passage === 'string');
-      await saveCaptures(valid);
+      const backup = JSON.parse(await file.text()) as { version?: unknown; captures?: unknown };
+      if (backup.version !== 1 || !Array.isArray(backup.captures) || !backup.captures.every(isStoredCapture)) throw new Error();
+      await saveCaptures(backup.captures, namespace);
       selectedId = '';
       await reload();
-      notify(`Restored ${valid.length} passage${valid.length === 1 ? '' : 's'} from backup.`);
+      notify(`Restored ${backup.captures.length} passage${backup.captures.length === 1 ? '' : 's'} from backup.`);
     } catch {
       notify('That file is not a valid Source-to-Recall Gate backup.');
     } finally {
@@ -488,12 +497,13 @@ export async function mountWorkbench(root: HTMLElement): Promise<void> {
   updateNetwork();
   try {
     await reload();
+    if (options.demo && captures[0]) openCapture(captures[0]);
   } catch {
     queueEmpty.hidden = false;
-    queueEmpty.querySelector('p')!.innerHTML = '<strong>Local storage is unavailable.</strong><br>Allow site storage, then reload to use the gate.';
+    queueEmpty.querySelector('p')!.innerHTML = '<strong>Local storage is unavailable.</strong><br>Allow site storage, then reload to use the tool.';
   }
   try {
-    license = await initializeLicense();
+    license = await initializeLicense(fetch, options.demo);
   } catch {
     license = { unlocked: false, notice: 'License storage is unavailable. Your free tools still work.', token: '' };
   }

@@ -24,8 +24,11 @@ const route = swaConfig.routes?.find((entry) => entry.route === '/downloads/sour
 if (route?.headers?.['Content-Type'] !== 'application/zip') {
   throw new Error('Static deployment config must declare application/zip for the extension download.');
 }
-if (!swaConfig.navigationFallback?.exclude?.includes('/downloads/*')) {
-  throw new Error('Static deployment config must exclude downloads from SPA fallback.');
+if (swaConfig.navigationFallback) {
+  throw new Error('The multi-page site must not route unknown paths to the home page.');
+}
+if (swaConfig.responseOverrides?.['404']?.rewrite !== '/404.html') {
+  throw new Error('Static deployment config must serve the designed 404 page for unknown paths.');
 }
 
 console.log(`Built-output regression passed: valid MV3 ZIP at ${archive} (${archiveBytes.length} bytes).`);

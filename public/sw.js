@@ -1,12 +1,13 @@
-const CACHE = 'source-to-recall-gate-v2';
-const SHELL = ['/', '/index.html', '/manifest.webmanifest', '/icon/128.png', '/assets/press-gate-820.webp', '/assets/press-gate-1200.webp', '/assets/press-gate-1200.jpg'];
+const CACHE = 'source-to-recall-gate-v3';
+const PAGES = ['/', '/index.html', '/demo/', '/privacy/', '/terms/', '/404.html'];
+const SHELL = [...PAGES, '/manifest.webmanifest', '/icon/128.png', '/icon/apple-touch-icon.png', '/assets/press-gate-820.webp', '/assets/press-gate-1200.webp', '/assets/press-gate-1200.jpg', '/assets/source-to-recall-social.jpg'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE);
     await cache.addAll(SHELL);
-    const html = await (await fetch('/')).text();
-    const builtAssets = [...html.matchAll(/(?:src|href)="(\/assets\/[^"?#]+)["?#]/g)].map((match) => match[1]);
+    const htmlPages = await Promise.all(PAGES.map(async (path) => (await fetch(path)).text()));
+    const builtAssets = htmlPages.flatMap((html) => [...html.matchAll(/(?:src|href)="(\/assets\/[^"?#]+)["?#]/g)].map((match) => match[1]));
     await cache.addAll([...new Set(builtAssets)]);
     await self.skipWaiting();
   })());

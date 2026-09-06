@@ -5,15 +5,15 @@ export default defineConfig({
   outDir: '.output',
   manifest: {
     name: 'Source-to-Recall Gate',
-    description: 'Turn selected passages into personally meaningful recall cues before they become queue debt.',
+    description: 'Turn selected passages into recall prompts after writing a paraphrase, cue, and use-case.',
     version: '1.0.0',
     permissions: ['storage', 'contextMenus', 'activeTab', 'scripting'],
     host_permissions: ['https://api.sociobot.in/*'],
-    action: { default_title: 'Send selection to the gate' },
+    action: { default_title: 'Save selected text for review' },
     commands: {
       'capture-selection': {
         suggested_key: { default: 'Alt+Shift+G', mac: 'Alt+Shift+G' },
-        description: 'Send the current selection to Source-to-Recall Gate'
+        description: 'Save the current selection for review'
       }
     },
     icons: {

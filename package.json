@@ -11,6 +11,7 @@
     "build:extension": "wxt build",
     "zip": "wxt zip",
     "test": "vitest run --root . src",
+    "test:claims": "node scripts/test-claims.mjs",
     "test:watch": "vitest --root . src",
     "test:e2e": "playwright test",
     "test:extension": "npm run build:extension && node scripts/smoke-extension.mjs",
@@ -18,15 +19,14 @@
     "test:live-download": "node scripts/verify-live-download.mjs",
     "typecheck": "tsc --noEmit"
   },
-  "dependencies": {},
   "devDependencies": {
-    "@axe-core/playwright": "^4.10.2",
+    "@axe-core/playwright": "^4.13.0",
     "@playwright/test": "1.58.2",
-    "@types/node": "^22.10.7",
-    "@types/chrome": "^0.0.302",
-    "typescript": "^5.7.3",
-    "vite": "^6.0.11",
-    "vitest": "^2.1.8",
-    "wxt": "^0.20.6"
+    "@types/chrome": "^0.2.9",
+    "@types/node": "^22.20.1",
+    "typescript": "^5.9.3",
+    "vite": "^8.2.2",
+    "vitest": "^5.0.0",
+    "wxt": "^0.21.4"
   }
 }

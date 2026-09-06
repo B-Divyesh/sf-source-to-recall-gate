@@ -96,3 +96,7 @@ and smooth scrolling become instant. Nothing loops or flashes.
 
 The product mark and functional icons are hand-authored SVG/CSS geometry. The
 footer discloses that the hero artwork is AI-generated.
+
+The 1200 × 630 social preview is a crop of the same generated `press-gate`
+source. The 180 px Apple touch icon is a raster export of the hand-authored
+product mark. No additional third-party artwork or font was introduced.

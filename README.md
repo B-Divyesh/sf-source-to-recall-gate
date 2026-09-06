@@ -8,27 +8,34 @@ does export become available.
 
 Live site: <https://source-to-recall-gate.sociobot.in>
 
+Sample demo: <https://source-to-recall-gate.sociobot.in/demo/>
+
 ## What it does
 
 - Captures only text the user selects through a context menu, `Alt + Shift + G`,
   the extension popup, or an explicit paste in the PWA.
 - Stores passages and decisions locally (`chrome.storage.local` in the
-  extension; `localStorage` in the PWA). No account, cloud sync, tracking, or AI
-  card generation.
+  extension; `localStorage` in the PWA). The free flow needs no account and
+  makes no analytics, sync, AI, or study-content requests.
 - Requires a paraphrase, recall cue, and use-case before export.
 - Exports each ready prompt as Markdown, CSV, or Anki-compatible TSV.
 - Supports offline use after the PWA’s first load and includes clear empty,
   offline, error, undo, and delete-confirmation states.
-- Offers an optional $9 one-time Press Pass for batch export and local JSON
-  backup/restore. Individual exports, accessibility, and privacy controls remain
-  free. Checkout and license verification use only the Sociobot billing API.
+- Keeps individual exports and local deletion free.
+- Defines a $9 one-time Press Pass for batch export and local JSON backup and
+  restore. Existing holders can verify a license. New checkout is unavailable
+  until the Sociobot billing operator registers this offer.
+
+Choose **Try it with sample data** or open `/demo/` to load three study passages
+in a separate `demo:` storage namespace. **Reset demo** restores the sample.
+**Start for real** removes the demo namespace and leaves normal saved data alone.
 
 ## Develop
 
-Requires Node.js 20+ and npm.
+Requires Node.js 22.12+ and npm.
 
 ```bash
-npm install
+npm ci
 npm run dev              # PWA/site at the printed local URL
 npm run dev:extension    # WXT extension development mode
 ```
@@ -37,6 +44,7 @@ npm run dev:extension    # WXT extension development mode
 
 ```bash
 npm test                 # unit tests
+npm run test:claims      # every command declared in .factory/claims.json
 npm run typecheck        # strict TypeScript
 npx playwright install chromium  # once, for browser tests
 npm run test:e2e         # desktop + 390 px flows and axe checks
@@ -48,7 +56,9 @@ npm run build            # alias for the exact production build command
 `npm run build` produces:
 
 - `dist/site/index.html` and the complete static PWA/landing site;
+- `dist/site/demo/index.html` and the isolated sample demo;
 - `dist/site/privacy/index.html` and `dist/site/terms/index.html`;
+- `dist/site/404.html`, served with HTTP 404 for unknown routes;
 - `dist/site/downloads/source-to-recall-gate-chrome.zip`, the packaged MV3
   extension.
 

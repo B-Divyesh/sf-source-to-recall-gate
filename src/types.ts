@@ -49,3 +49,20 @@ export function normalizeUrl(raw: string): string {
     return '';
   }
 }
+
+function isDate(value: string): boolean {
+  return Number.isFinite(Date.parse(value));
+}
+
+export function isStoredCapture(value: unknown): value is Capture {
+  if (!value || typeof value !== 'object') return false;
+  const item = value as Partial<Capture>;
+  const strings = [item.id, item.passage, item.sourceTitle, item.sourceUrl, item.createdAt, item.paraphrase, item.cue, item.useCase];
+  if (!strings.every((entry) => typeof entry === 'string')) return false;
+  if (!item.id || item.id.length > 256 || item.passage!.trim().length < 3 || item.passage!.length > FIELD_LIMITS.passage) return false;
+  if (item.sourceTitle!.length > FIELD_LIMITS.sourceTitle || item.sourceUrl!.length > FIELD_LIMITS.sourceUrl) return false;
+  if ([item.paraphrase, item.cue, item.useCase].some((entry) => entry!.length > FIELD_LIMITS.decision)) return false;
+  if (!isDate(item.createdAt!)) return false;
+  if (item.sourceUrl && normalizeUrl(item.sourceUrl) !== item.sourceUrl) return false;
+  return item.exportedAt === undefined || (typeof item.exportedAt === 'string' && isDate(item.exportedAt));
+}

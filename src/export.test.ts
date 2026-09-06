@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { serializeCaptures } from './export';
-import { createCapture, isReady, normalizeUrl, type Capture } from './types';
+import { createCapture, isReady, isStoredCapture, normalizeUrl, type Capture } from './types';
 
 function readyCapture(overrides: Partial<Capture> = {}): Capture {
   return {
@@ -33,6 +33,13 @@ describe('capture gate', () => {
   it('rejects unsafe and malformed source protocols', () => {
     expect(normalizeUrl('javascript:alert(1)')).toBe('');
     expect(normalizeUrl('not a url')).toBe('');
+  });
+
+  it('rejects incomplete or unsafe backup records', () => {
+    expect(isStoredCapture(readyCapture())).toBe(true);
+    expect(isStoredCapture({ id: 'broken', passage: 'Missing fields' })).toBe(false);
+    expect(isStoredCapture(readyCapture({ sourceUrl: 'javascript:alert(1)' }))).toBe(false);
+    expect(isStoredCapture(readyCapture({ createdAt: 'not-a-date' }))).toBe(false);
   });
 });
 

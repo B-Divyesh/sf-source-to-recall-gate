@@ -1,0 +1,107 @@
+[
+  {
+    "id": "demo-isolation",
+    "claim": "Try three sample passages without changing saved study data.",
+    "where": "home first action, demo banner, README",
+    "test": "npm run test:e2e -- --grep @claim:demo-isolation",
+    "sandbox": "fresh browser storage; seed a real sentinel; edit, reset, and exit the demo; assert the sentinel is unchanged"
+  },
+  {
+    "id": "three-decisions",
+    "claim": "A paraphrase, cue, and use-case are required before export.",
+    "where": "workbench, home, README",
+    "test": "npm run test:e2e -- --grep @claim:three-decisions",
+    "sandbox": "sample prompt; remove one answer, observe disabled export, restore it, and inspect the downloaded content"
+  },
+  {
+    "id": "individual-exports",
+    "claim": "Download one ready prompt as Markdown, CSV, or Anki TSV.",
+    "where": "workbench, how it works, README",
+    "test": "npm run test:e2e -- --grep @claim:individual-exports",
+    "sandbox": "ready sample prompt; download all three formats and assert format-specific content"
+  },
+  {
+    "id": "local-privacy",
+    "claim": "The free flow needs no account and makes no analytics, sync, AI, or study-content requests.",
+    "where": "home facts, privacy, README",
+    "test": "npm run test:e2e -- --grep @claim:local-privacy",
+    "sandbox": "record method, type, body, and origin for every request while editing, saving, and exporting a private demo answer"
+  },
+  {
+    "id": "offline-reload",
+    "claim": "The tool works offline after the first visit.",
+    "where": "home facts, README",
+    "test": "npm run test:e2e -- --grep @claim:offline-reload",
+    "sandbox": "dedicated browser context; load demo, wait for its service worker, go offline, reload, and use the populated tool"
+  },
+  {
+    "id": "local-persistence",
+    "claim": "Passages and answers stay in local browser storage across reloads.",
+    "where": "workbench, privacy, README",
+    "test": "npm run test:e2e -- --grep @claim:local-persistence",
+    "sandbox": "fresh normal store; add a 4,000-character passage, export unsaved answers, reload, discard, and undo"
+  },
+  {
+    "id": "delete-local-data",
+    "claim": "Delete all local study data from the current browser.",
+    "where": "workbench, privacy, README",
+    "test": "npm run test:e2e -- --grep @claim:delete-local-data",
+    "sandbox": "sample store; confirm deletion, reload, and assert the empty state remains"
+  },
+  {
+    "id": "extension-download",
+    "claim": "Download the packaged Chrome extension.",
+    "where": "header, README",
+    "test": "npm run test:e2e -- --grep @claim:extension-download",
+    "sandbox": "built site; download the advertised file and assert its filename and ZIP signature"
+  },
+  {
+    "id": "extension-context-menu",
+    "claim": "Save selected text with the extension context menu.",
+    "where": "extension menu, README",
+    "test": "npm test -- --testNamePattern @claim:extension-context-menu",
+    "sandbox": "in-memory extension storage and browser API; invoke the menu handler and assert the selected text is stored and review opens"
+  },
+  {
+    "id": "extension-shortcut",
+    "claim": "Save selected text with Alt + Shift + G.",
+    "where": "extension command, popup, README",
+    "test": "npm test -- --testNamePattern @claim:extension-shortcut",
+    "sandbox": "in-memory extension storage and active-tab selection; invoke the registered command outcome and assert storage and review"
+  },
+  {
+    "id": "extension-toolbar",
+    "claim": "Save selected text from the extension toolbar popup.",
+    "where": "extension popup, README",
+    "test": "npm test -- --testNamePattern @claim:extension-toolbar",
+    "sandbox": "in-memory extension storage and active-tab selection; invoke the popup message outcome and assert storage and review"
+  },
+  {
+    "id": "press-pass-activation",
+    "claim": "A valid Press Pass activates paid tools.",
+    "where": "paid tools, terms, README",
+    "test": "npm run test:e2e -- --grep @claim:press-pass-activation",
+    "sandbox": "demo route with a recorded valid verification response; assert paid controls and isolated license storage"
+  },
+  {
+    "id": "batch-export",
+    "claim": "Press Pass exports every ready prompt in one file.",
+    "where": "paid tools, terms, README",
+    "test": "npm run test:e2e -- --grep @claim:batch-export",
+    "sandbox": "licensed sample demo; download CSV and assert both ready prompts and no unfinished prompt"
+  },
+  {
+    "id": "backup-download",
+    "claim": "Press Pass downloads a local JSON backup.",
+    "where": "paid tools, terms, README",
+    "test": "npm run test:e2e -- --grep @claim:backup-download",
+    "sandbox": "licensed sample demo; download and parse versioned JSON containing every sample passage"
+  },
+  {
+    "id": "backup-restore",
+    "claim": "Press Pass restores a local JSON backup.",
+    "where": "paid tools, terms, README",
+    "test": "npm run test:e2e -- --grep @claim:backup-restore",
+    "sandbox": "licensed sample demo; upload a valid backup, assert restored content, then reload"
+  }
+]
